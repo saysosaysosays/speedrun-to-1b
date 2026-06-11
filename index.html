@@ -100,11 +100,11 @@
   .btn:not(.btn--ghost){position:relative;overflow:hidden}
   .btn:not(.btn--ghost)::after{
     content:"";position:absolute;top:0;left:-80%;width:40%;height:100%;
-    background:linear-gradient(105deg,transparent,rgba(255,255,255,.5),transparent);
+    background:linear-gradient(105deg,transparent,rgba(255,255,255,.32),transparent);
     transform:skewX(-20deg);
-    animation:shine 3.4s ease-in-out infinite;
+    animation:shine 5s cubic-bezier(.4,0,.2,1) infinite;
   }
-  @keyframes shine{0%,55%{left:-80%}75%,100%{left:160%}}
+  @keyframes shine{0%,62%{left:-80%}82%,100%{left:160%}}
   .btn--ghost{background:transparent;color:var(--green)}
   .btn--ghost:hover{box-shadow:0 0 18px 0 rgba(43,217,74,.3)}
   .btn--usdc{background:var(--usdc);border-color:var(--usdc);color:#fff}
@@ -139,9 +139,9 @@
   }
   .race-fill::before{
     content:"";position:absolute;inset:0;
-    background:repeating-linear-gradient(-55deg,rgba(255,255,255,.16) 0 9px,transparent 9px 18px);
+    background:repeating-linear-gradient(-55deg,rgba(255,255,255,.12) 0 9px,transparent 9px 18px);
     background-size:22px 22px;
-    animation:stripes .9s linear infinite;
+    animation:stripes 1.4s linear infinite;
   }
   @keyframes stripes{to{background-position:22px 0}}
   .race-fill::after{
@@ -152,14 +152,6 @@
     will-change:opacity;
   }
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-  /* node dot at each rival's true position, sitting on the bar's lower edge */
-  .rtick{
-    position:absolute;top:100%;width:9px;height:9px;border-radius:50%;
-    transform:translate(-50%,-50%);
-    background:var(--bg);border:2px solid var(--green-dim);
-    box-shadow:0 0 8px rgba(43,217,74,.35);
-    z-index:2;
-  }
   .race-goal{
     position:absolute;top:-8px;bottom:-8px;width:3px;background:var(--gold);
     animation:goalGlow 2.4s ease-in-out infinite;
@@ -189,38 +181,46 @@
   .race-me .t{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.06em}
   .race-me .c{font-size:13px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
   /* fan-out connectors from ticks down to the evenly spaced rival cards */
-  .race-fan{display:block;width:100%;height:52px;margin-top:-2px}
+  .race-fan{display:block;width:100%;height:56px}
   .race-fan path{
-    stroke:url(#fanGrad);fill:none;stroke-width:1.4;stroke-linecap:round;
-    stroke-dasharray:1;stroke-dashoffset:1;
-    animation:draw 1s cubic-bezier(.4,0,.2,1) forwards;
+    stroke:url(#fanGrad);fill:none;stroke-width:1.3;stroke-linecap:round;
+    stroke-dasharray:1;stroke-dashoffset:1;opacity:0;
+    animation:draw 1.6s cubic-bezier(.25,.1,.25,1) forwards;
+    transition:stroke .3s,stroke-width .3s;
   }
-  .race-fan path:nth-child(2){animation-delay:.08s}
-  .race-fan path:nth-child(3){animation-delay:.16s}
-  .race-fan path:nth-child(4){animation-delay:.24s}
-  .race-fan path:nth-child(5){animation-delay:.32s}
-  .race-fan path:nth-child(6){animation-delay:.4s}
-  @keyframes draw{to{stroke-dashoffset:0}}
+  .race-fan path.hot{stroke:var(--green);stroke-width:2;opacity:1}
+  .race-fan path:nth-child(3){animation-delay:.07s}
+  .race-fan path:nth-child(4){animation-delay:.14s}
+  .race-fan path:nth-child(5){animation-delay:.21s}
+  .race-fan path:nth-child(6){animation-delay:.28s}
+  .race-fan path:nth-child(7){animation-delay:.35s}
+  .race-fan path:nth-child(8){animation-delay:.42s}
+  .race-fan path:nth-child(9){animation-delay:.49s}
+  @keyframes draw{0%{opacity:0;stroke-dashoffset:1}30%{opacity:1}100%{opacity:1;stroke-dashoffset:0}}
   .race-rivals{display:flex}
-  .race-rivals .rv{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+  .race-rivals .rv{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:default}
   .rv img{
-    width:36px;height:36px;border-radius:50%;background:#fff;
+    width:34px;height:34px;border-radius:50%;background:#fff;
     border:2px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.5);
-    transition:transform .15s,border-color .15s;
+    transition:transform .35s cubic-bezier(.34,1.56,.64,1),border-color .25s ease,box-shadow .25s ease;
   }
-  .rv:hover img{transform:scale(1.12);border-color:var(--green-dim)}
-  .rv .nm{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--text)}
-  .rv .hc{font-size:10px;color:var(--muted)}
+  .rv:hover img{transform:translateY(-3px) scale(1.08);border-color:var(--green-dim);box-shadow:0 8px 18px rgba(0,0,0,.6),0 0 14px rgba(43,217,74,.25)}
+  .rv .nm{font-size:10.5px;font-weight:700;letter-spacing:.05em;color:var(--text)}
+  .rv .hc{font-size:9.5px;color:var(--muted)}
+  @media(max-width:760px){
+    .race-fan{display:none}
+    .race-rivals{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px;margin-top:18px}
+  }
   /* rival already lapped by $1B */
   .rv.flipped img{border-color:var(--green);box-shadow:0 0 16px rgba(43,217,74,.5);filter:grayscale(.5)}
   .rv.flipped .nm{color:var(--muted);text-decoration:line-through}
-  .rv.flipped .nm::after{content:" ✓ FLIPPED";color:var(--green);text-decoration:none;display:inline-block;margin-left:2px}
+  .rv.flipped .nm::after{content:" ✓";color:var(--green);text-decoration:none;display:inline-block;margin-left:2px}
   /* holder count bump on update */
   .race-count{display:inline-block}
-  .race-count.bump{animation:bump .5s ease}
-  @keyframes bump{35%{transform:scale(1.08)}}
+  .race-count.bump{animation:bump .7s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes bump{35%{transform:scale(1.04)}}
   /* scroll reveal */
-  .rev{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+  .rev{opacity:0;transform:translateY(14px);transition:opacity .9s cubic-bezier(.25,.1,.25,1),transform .9s cubic-bezier(.25,.1,.25,1)}
   .rev.vis{opacity:1;transform:none}
   @media (prefers-reduced-motion: reduce){
     .rev{opacity:1;transform:none;transition:none}
@@ -300,12 +300,11 @@
     text-align:center;padding:26px 10px 6px;color:var(--green);
     text-shadow:0 0 18px rgba(43,217,74,.55);
     font-variant-numeric:tabular-nums;letter-spacing:.02em;
-    animation:crt 5s linear infinite;
+    animation:crt 7s linear infinite;
   }
   @keyframes crt{
-    0%,96.5%,98.5%,100%{opacity:1}
-    97%{opacity:.82}
-    98%{opacity:.94}
+    0%,96%,99%,100%{opacity:1}
+    97.5%{opacity:.93}
   }
   .timer small{font-size:.45em;color:var(--green-dim)}
   .timer-label{text-align:center;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);padding-bottom:20px}
@@ -504,30 +503,31 @@
   <div class="race-track-wrap">
     <div class="race-track">
       <div class="race-fill" id="raceFill"></div>
-      <div class="rtick" style="left:30.6%"></div>
-      <div class="rtick" style="left:31.5%"></div>
-      <div class="rtick" style="left:38.1%"></div>
-      <div class="rtick" style="left:38.4%"></div>
-      <div class="rtick" style="left:40.9%"></div>
       <div class="race-goal" style="left:100%"><span class="lbl">🏁 1B</span></div>
       <div class="race-me" id="raceMe" style="left:0%"><img src="assets/coin.png" alt="$1B"><span class="t">$1B</span><span class="c" id="meCount">···</span></div>
     </div>
-    <svg class="race-fan" viewBox="0 0 1000 52" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="race-fan" viewBox="0 0 1000 56" preserveAspectRatio="none" aria-hidden="true">
       <defs>
         <linearGradient id="fanGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#2bd94a" stop-opacity=".5"/>
-          <stop offset="1" stop-color="#2bd94a" stop-opacity=".1"/>
+          <stop offset="0" stop-color="#2bd94a" stop-opacity=".55"/>
+          <stop offset="1" stop-color="#2bd94a" stop-opacity=".08"/>
         </linearGradient>
       </defs>
-      <path pathLength="1" d="M306,4 C306,30 100,26 100,52"/>
-      <path pathLength="1" d="M315,4 C315,30 300,26 300,52"/>
-      <path pathLength="1" d="M381,4 C381,30 500,26 500,52"/>
-      <path pathLength="1" d="M384,4 C384,30 700,26 700,52"/>
-      <path pathLength="1" d="M409,4 C409,30 900,26 900,52"/>
+      <path pathLength="1" d="M269,0 C269,34 62.5,22 62.5,56"/>
+      <path pathLength="1" d="M284,0 C284,34 187.5,22 187.5,56"/>
+      <path pathLength="1" d="M306,0 C306,34 312.5,22 312.5,56"/>
+      <path pathLength="1" d="M315,0 C315,34 437.5,22 437.5,56"/>
+      <path pathLength="1" d="M329,0 C329,34 562.5,22 562.5,56"/>
+      <path pathLength="1" d="M381,0 C381,34 687.5,22 687.5,56"/>
+      <path pathLength="1" d="M384,0 C384,34 812.5,22 812.5,56"/>
+      <path pathLength="1" d="M409,0 C409,34 937.5,22 937.5,56"/>
     </svg>
     <div class="race-rivals">
+      <div class="rv" data-h="90000"><img src="assets/moodeng.jpg" alt="Moo Deng"><span class="nm">MOODENG</span><span class="hc">~90K</span></div>
+      <div class="rv" data-h="120000"><img src="assets/popcat.jpg" alt="Popcat"><span class="nm">POPCAT</span><span class="hc">~120K</span></div>
       <div class="rv" data-h="175000"><img src="assets/fartcoin.jpg" alt="Fartcoin"><span class="nm">FARTCOIN</span><span class="hc">~175K</span></div>
       <div class="rv" data-h="210000"><img src="assets/wif.jpg" alt="dogwifhat"><span class="nm">WIF</span><span class="hc">~210K</span></div>
+      <div class="rv" data-h="270000"><img src="assets/pnut.png" alt="Peanut the Squirrel"><span class="nm">PNUT</span><span class="hc">~270K</span></div>
       <div class="rv" data-h="620000"><img src="assets/pengu.png" alt="Pudgy Penguins"><span class="nm">PENGU</span><span class="hc">~620K</span></div>
       <div class="rv" data-h="650000"><img src="assets/trump.png" alt="Official Trump"><span class="nm">TRUMP</span><span class="hc">~650K</span></div>
       <div class="rv" data-h="980000"><img src="assets/bonk.jpg" alt="Bonk"><span class="nm">BONK</span><span class="hc">~980K</span></div>
@@ -754,6 +754,13 @@
   renderHolders();
   fetchHolders();
   setInterval(fetchHolders, 60000);
+
+  // hovering a rival card highlights its connector line
+  const fanPaths = document.querySelectorAll('.race-fan path');
+  document.querySelectorAll('.race-rivals .rv').forEach((rv, i) => {
+    rv.addEventListener('mouseenter', () => fanPaths[i] && fanPaths[i].classList.add('hot'));
+    rv.addEventListener('mouseleave', () => fanPaths[i] && fanPaths[i].classList.remove('hot'));
+  });
 
   // scroll-reveal: sections fade up as they enter the viewport
   const obs = new IntersectionObserver(entries => entries.forEach(e => {
