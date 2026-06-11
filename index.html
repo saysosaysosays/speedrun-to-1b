@@ -295,9 +295,31 @@
   .timerbox__title{font-size:13px;font-weight:700;letter-spacing:.06em}
   .timerbox__cat{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
   .wr-badge{margin-left:auto;font-size:11px;font-weight:700;color:#1a1300;background:var(--gold);padding:4px 9px;border-radius:3px;letter-spacing:.1em}
+  .holders-head{
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    margin-top:24px;
+    font-size:12px;font-weight:700;letter-spacing:.34em;color:var(--green);
+    text-shadow:0 0 10px rgba(43,217,74,.4);
+  }
+  .hdot{
+    width:9px;height:9px;border-radius:50%;background:var(--green);flex:none;
+    box-shadow:0 0 8px rgba(43,217,74,.9);
+    animation:hdot 1.6s ease-in-out infinite;
+  }
+  @keyframes hdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.78)}}
+  .holders-delta{
+    height:18px;text-align:center;font-size:13px;font-weight:700;color:var(--green);
+    opacity:0;
+  }
+  .holders-delta.pop{animation:deltaPop 2.6s ease forwards}
+  @keyframes deltaPop{
+    0%{opacity:0;transform:translateY(8px)}
+    15%,70%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(-6px)}
+  }
   .timer{
     font-family:var(--timer);font-size:clamp(64px,7vw,92px);line-height:1;
-    text-align:center;padding:26px 10px 6px;color:var(--green);
+    text-align:center;padding:8px 10px 2px;color:var(--green);
     text-shadow:0 0 18px rgba(43,217,74,.55);
     font-variant-numeric:tabular-nums;letter-spacing:.02em;
     animation:crt 7s linear infinite;
@@ -565,8 +587,10 @@
       </div>
       <span class="wr-badge">WR ATTEMPT</span>
     </div>
+    <div class="holders-head"><span class="hdot"></span>LIVE HOLDERS</div>
     <div class="timer" id="heroHolders">···</div>
-    <div class="timer-label">Live holders · <span id="timer">00:00:00</span> since launch</div>
+    <div class="holders-delta" id="holdersDelta"></div>
+    <div class="timer-label">goal: 1,000,000,000 · <span id="timer">00:00:00</span> since launch</div>
     <div class="splits">
       <div class="split done"><span class="gold-dot"></span><span class="name">First 100 holders</span><span class="delta">−0:12</span><span class="time">DONE</span></div>
       <div class="split done"><span class="gold-dot"></span><span class="name">Lap honestchud</span><span class="delta">−14:59</span><span class="time">DONE</span></div>
@@ -732,6 +756,13 @@
       [document.querySelector('.race-count'), document.getElementById('heroHolders')].forEach(el => {
         el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
       });
+      // float a "+N" above the label when the count grows
+      const d = holders - renderHolders.last;
+      if (renderHolders.last !== undefined && d > 0){
+        const de = document.getElementById('holdersDelta');
+        de.textContent = '▲ +' + d.toLocaleString('en-US') + ' holders';
+        de.classList.remove('pop'); void de.offsetWidth; de.classList.add('pop');
+      }
       renderHolders.last = holders;
     }
   }
