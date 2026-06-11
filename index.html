@@ -212,10 +212,36 @@
     .race-fan{display:none}
     .race-rivals{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 8px;margin-top:18px}
   }
-  /* rival already lapped by $1B */
-  .rv.flipped img{border-color:var(--green);box-shadow:0 0 16px rgba(43,217,74,.5);filter:grayscale(.5)}
+  /* rival lapped by $1B */
+  .rv-pic{position:relative;display:inline-flex;line-height:0}
+  .chk{
+    position:absolute;right:-3px;bottom:-3px;
+    width:17px;height:17px;border-radius:50%;
+    background:var(--green);color:#03140a;
+    font-size:10px;font-weight:900;line-height:17px;text-align:center;
+    border:2px solid var(--bg);
+    opacity:0;transform:scale(.3);
+    transition:opacity .3s ease,transform .45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .rv.flipped .chk{opacity:1;transform:scale(1)}
+  .rv.flipped img{filter:grayscale(.65) brightness(.8);border-color:var(--green-dim)}
   .rv.flipped .nm{color:var(--muted);text-decoration:line-through}
-  .rv.flipped .nm::after{content:" ✓";color:var(--green);text-decoration:none;display:inline-block;margin-left:2px}
+  .rv .flag{
+    font-size:9px;font-weight:800;letter-spacing:.13em;color:var(--green);
+    text-shadow:0 0 8px rgba(43,217,74,.5);
+    height:0;opacity:0;overflow:hidden;transition:opacity .35s ease;
+  }
+  .rv.flipped .flag{height:auto;opacity:1}
+  .rv.flipped .hc{display:none}
+  /* one-time celebration the moment $1B passes a coin */
+  .rv.justflipped{animation:flipPop .8s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes flipPop{0%{transform:scale(1)}32%{transform:scale(1.16)}100%{transform:scale(1)}}
+  .rv.justflipped .rv-pic::after{
+    content:"";position:absolute;inset:-6px;border-radius:50%;
+    border:2px solid var(--green);pointer-events:none;
+    animation:flipRing .8s ease-out forwards;
+  }
+  @keyframes flipRing{0%{opacity:.9;transform:scale(.65)}100%{opacity:0;transform:scale(1.7)}}
   /* holder count bump on update */
   .race-count{display:inline-block}
   .race-count.bump,.timer.bump{animation:bump .7s cubic-bezier(.34,1.56,.64,1)}
@@ -547,15 +573,15 @@
       <path pathLength="1" d="M408,0 C408,34 944.4,22 944.4,56"/>
     </svg>
     <div class="race-rivals">
-      <div class="rv" data-h="90000"><img src="assets/moodeng.jpg" alt="Moo Deng"><span class="nm">MOODENG</span><span class="hc">~90K</span></div>
-      <div class="rv" data-h="120000"><img src="assets/popcat.jpg" alt="Popcat"><span class="nm">POPCAT</span><span class="hc">~120K</span></div>
-      <div class="rv" data-h="121000"><img src="assets/pump.png" alt="Pump"><span class="nm">PUMP</span><span class="hc">~121K</span></div>
-      <div class="rv" data-h="175000"><img src="assets/fartcoin.jpg" alt="Fartcoin"><span class="nm">FARTCOIN</span><span class="hc">~175K</span></div>
-      <div class="rv" data-h="210000"><img src="assets/wif.jpg" alt="dogwifhat"><span class="nm">WIF</span><span class="hc">~210K</span></div>
-      <div class="rv" data-h="270000"><img src="assets/pnut.png" alt="Peanut the Squirrel"><span class="nm">PNUT</span><span class="hc">~270K</span></div>
-      <div class="rv" data-h="620000"><img src="assets/pengu.png" alt="Pudgy Penguins"><span class="nm">PENGU</span><span class="hc">~620K</span></div>
-      <div class="rv" data-h="650000"><img src="assets/trump.png" alt="Official Trump"><span class="nm">TRUMP</span><span class="hc">~650K</span></div>
-      <div class="rv" data-h="980000"><img src="assets/bonk.jpg" alt="Bonk"><span class="nm">BONK</span><span class="hc">~980K</span></div>
+      <div class="rv" data-h="90000"><span class="rv-pic"><img src="assets/moodeng.jpg" alt="Moo Deng"><i class="chk">✓</i></span><span class="nm">MOODENG</span><span class="hc">~90K</span><span class="flag">FLIPPED</span></div>
+      <div class="rv" data-h="120000"><span class="rv-pic"><img src="assets/popcat.jpg" alt="Popcat"><i class="chk">✓</i></span><span class="nm">POPCAT</span><span class="hc">~120K</span><span class="flag">FLIPPED</span></div>
+      <div class="rv" data-h="121000"><span class="rv-pic"><img src="assets/pump.png" alt="Pump"><i class="chk">✓</i></span><span class="nm">PUMP</span><span class="hc">~121K</span><span class="flag">FLIPPED</span></div>
+      <div class="rv" data-h="175000"><span class="rv-pic"><img src="assets/fartcoin.jpg" alt="Fartcoin"><i class="chk">✓</i></span><span class="nm">FARTCOIN</span><span class="hc">~175K</span><span class="flag">FLIPPED</span></div>
+      <div class="rv" data-h="210000"><span class="rv-pic"><img src="assets/wif.jpg" alt="dogwifhat"><i class="chk">✓</i></span><span class="nm">WIF</span><span class="hc">~210K</span><span class="flag">FLIPPED</span></div>
+      <div class="rv" data-h="270000"><span class="rv-pic"><img src="assets/pnut.png" alt="Peanut the Squirrel"><i class="chk">✓</i></span><span class="nm">PNUT</span><span class="hc">~270K</span><span class="flag">FLIPPED</span></div>
+      <div class="rv" data-h="620000"><span class="rv-pic"><img src="assets/pengu.png" alt="Pudgy Penguins"><i class="chk">✓</i></span><span class="nm">PENGU</span><span class="hc">~620K</span><span class="flag">FLIPPED</span></div>
+      <div class="rv" data-h="650000"><span class="rv-pic"><img src="assets/trump.png" alt="Official Trump"><i class="chk">✓</i></span><span class="nm">TRUMP</span><span class="hc">~650K</span><span class="flag">FLIPPED</span></div>
+      <div class="rv" data-h="980000"><span class="rv-pic"><img src="assets/bonk.jpg" alt="Bonk"><i class="chk">✓</i></span><span class="nm">BONK</span><span class="hc">~980K</span><span class="flag">FLIPPED</span></div>
     </div>
   </div>
   <div class="race-foot" style="margin-top:18px">live on-chain holder count · next lap: <b id="nextLap">flip fartcoin</b></div>
@@ -749,7 +775,12 @@
     let next = null;
     document.querySelectorAll('.race-rivals .rv').forEach(rv => {
       const flipped = holders > +rv.dataset.h;
+      const was = rv.classList.contains('flipped');
       rv.classList.toggle('flipped', flipped);
+      // celebrate the exact moment we pass a coin (not on initial load)
+      if (flipped && !was && renderHolders.last !== undefined){
+        rv.classList.remove('justflipped'); void rv.offsetWidth; rv.classList.add('justflipped');
+      }
       if (!flipped && !next) next = rv.querySelector('.nm').textContent.split(' ')[0];
     });
     document.getElementById('nextLap').textContent = next ? 'flip ' + next.toLowerCase() : '1,000,000,000 holders';
