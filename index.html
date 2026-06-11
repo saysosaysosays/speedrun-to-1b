@@ -217,7 +217,7 @@
   .rv.flipped .nm::after{content:" ✓";color:var(--green);text-decoration:none;display:inline-block;margin-left:2px}
   /* holder count bump on update */
   .race-count{display:inline-block}
-  .race-count.bump{animation:bump .7s cubic-bezier(.34,1.56,.64,1)}
+  .race-count.bump,.timer.bump{animation:bump .7s cubic-bezier(.34,1.56,.64,1)}
   @keyframes bump{35%{transform:scale(1.04)}}
   /* scroll reveal */
   .rev{opacity:0;transform:translateY(14px);transition:opacity .9s cubic-bezier(.25,.1,.25,1),transform .9s cubic-bezier(.25,.1,.25,1)}
@@ -565,8 +565,8 @@
       </div>
       <span class="wr-badge">WR ATTEMPT</span>
     </div>
-    <div class="timer" id="timer">00:00:00<small>.00</small></div>
-    <div class="timer-label">Time since launch · still running</div>
+    <div class="timer" id="heroHolders">···</div>
+    <div class="timer-label">Live holders · <span id="timer">00:00:00</span> since launch</div>
     <div class="splits">
       <div class="split done"><span class="gold-dot"></span><span class="name">First 100 holders</span><span class="delta">−0:12</span><span class="time">DONE</span></div>
       <div class="split done"><span class="gold-dot"></span><span class="name">Lap honestchud</span><span class="delta">−14:59</span><span class="time">DONE</span></div>
@@ -691,9 +691,9 @@
     const h = Math.floor(ms/3600000);
     const m = Math.floor(ms/60000)%60;
     const s = Math.floor(ms/1000)%60;
-    const cs = Math.floor(ms/10)%100;
-    t1.innerHTML = `${pad(h)}:${pad(m)}:${pad(s)}<small>.${pad(cs)}</small>`;
-    t2.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    const str = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    t1.textContent = str;
+    t2.textContent = str;
     requestAnimationFrame(tick);
   }
   tick();
@@ -715,6 +715,7 @@
     document.getElementById('holderCount').textContent = fmt;
     document.getElementById('meCount').textContent = fmt;
     document.getElementById('navCount').textContent = fmt;
+    document.getElementById('heroHolders').textContent = fmt;
     document.getElementById('raceFill').style.width = pct + '%';
     // keep the chip from clipping off the track edges
     document.getElementById('raceMe').style.left = Math.min(94, Math.max(6, pct)) + '%';
@@ -728,8 +729,9 @@
     document.getElementById('nextLap').textContent = next ? 'flip ' + next.toLowerCase() : '1,000,000,000 holders';
     // bump the counter when the number changes
     if (renderHolders.last !== holders){
-      const rc = document.querySelector('.race-count');
-      rc.classList.remove('bump'); void rc.offsetWidth; rc.classList.add('bump');
+      [document.querySelector('.race-count'), document.getElementById('heroHolders')].forEach(el => {
+        el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+      });
       renderHolders.last = holders;
     }
   }
