@@ -219,6 +219,22 @@
   .hero-sub b{color:var(--text)}
   .hero-sub .u{color:var(--usdc);font-weight:700}
   .hero-cta{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap;animation:fadeUp .6s .28s both}
+  .hero-stats{
+    margin-top:36px;display:flex;gap:14px;flex-wrap:wrap;
+    animation:fadeUp .6s .36s both;
+  }
+  .hs{
+    flex:1;min-width:130px;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:16px 20px 13px;
+    transition:border-color .2s,transform .2s;
+  }
+  .hs:hover{border-color:var(--green-dim);transform:translateY(-3px)}
+  .hs-v{
+    display:block;font-family:var(--timer);font-size:30px;line-height:1;color:var(--green);
+    text-shadow:0 0 12px rgba(43,217,74,.35);font-variant-numeric:tabular-nums;
+  }
+  .hs-l{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
   @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 
   /* timer panel — LiveSplit style */
@@ -459,7 +475,7 @@
 
 <header class="hero">
   <div>
-    <div class="live-pill"><span class="live-dot"></span> RUN IN PROGRESS — ANY% GLITCHLESS</div>
+    <div class="live-pill"><span class="live-dot"></span> RUN IN PROGRESS — DAY <span id="runDay">1</span> · LIVE ON PUMP.FUN</div>
     <h1>SPEEDRUN<br>TO <span class="g">1 BILLION</span></h1>
     <p class="hero-sub">
       toly said the next real race is <b>a coin with 1,000,000,000 holders</b>.
@@ -470,6 +486,11 @@
     <div class="hero-cta">
       <a class="btn" href="https://pump.fun/coin/2Mcwccy7Ckf6C2BUfwG9Z6kcYp8Mj5tKFBHEEoYCpump" target="_blank" rel="noopener">JOIN THE RUN →</a>
       <a class="btn btn--ghost" href="https://x.com/ratwizardx/status/2064896088600195256" target="_blank" rel="noopener">THE TWEET</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><span class="hs-v" id="statPrice">—</span><span class="hs-l">Price</span></div>
+      <div class="hs"><span class="hs-v" id="statMcap">—</span><span class="hs-l">Market Cap</span></div>
+      <div class="hs"><span class="hs-v" id="statVol">—</span><span class="hs-l">24h Volume</span></div>
     </div>
   </div>
 
@@ -604,6 +625,7 @@
     const cs = Math.floor(ms/10)%100;
     t1.innerHTML = `${pad(h)}:${pad(m)}:${pad(s)}<small>.${pad(cs)}</small>`;
     t2.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    document.getElementById('runDay').textContent = Math.floor(ms/86400000) + 1;
     requestAnimationFrame(tick);
   }
   tick();
@@ -628,12 +650,19 @@
   }
   // Jupiter token API: real on-chain holder count (same number DexScreener shows),
   // free + CORS-enabled. pump.fun's num_participants only counts bonding-curve traders.
+  const compact = n => n >= 1e9 ? (n/1e9).toFixed(2)+'B' : n >= 1e6 ? (n/1e6).toFixed(2)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : n.toFixed(0);
   async function fetchHolders(){
     try{
       const res = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${MINT}`);
       const data = await res.json();
       const t = Array.isArray(data) && data.find(x => x.id === MINT);
       if (t && typeof t.holderCount === 'number') holders = t.holderCount;
+      if (t){
+        if (t.usdPrice) document.getElementById('statPrice').textContent = '$' + Number(t.usdPrice.toPrecision(2));
+        if (t.mcap) document.getElementById('statMcap').textContent = '$' + compact(t.mcap);
+        const v = t.stats24h ? (t.stats24h.buyVolume||0) + (t.stats24h.sellVolume||0) : 0;
+        if (v) document.getElementById('statVol').textContent = '$' + compact(v);
+      }
     }catch(e){ /* keep last known count */ }
     renderHolders();
   }
