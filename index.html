@@ -196,6 +196,7 @@
   .race-fan path:nth-child(7){animation-delay:.35s}
   .race-fan path:nth-child(8){animation-delay:.42s}
   .race-fan path:nth-child(9){animation-delay:.49s}
+  .race-fan path:nth-child(10){animation-delay:.56s}
   @keyframes draw{0%{opacity:0;stroke-dashoffset:1}30%{opacity:1}100%{opacity:1;stroke-dashoffset:0}}
   .race-rivals{display:flex}
   .race-rivals .rv{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:default}
@@ -209,7 +210,7 @@
   .rv .hc{font-size:9.5px;color:var(--muted)}
   @media(max-width:760px){
     .race-fan{display:none}
-    .race-rivals{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 8px;margin-top:18px}
+    .race-rivals{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 8px;margin-top:18px}
   }
   /* rival already lapped by $1B */
   .rv.flipped img{border-color:var(--green);box-shadow:0 0 16px rgba(43,217,74,.5);filter:grayscale(.5)}
@@ -535,18 +536,20 @@
           <stop offset="1" stop-color="#2bd94a" stop-opacity=".08"/>
         </linearGradient>
       </defs>
-      <path pathLength="1" d="M269,0 C269,34 62.5,22 62.5,56"/>
-      <path pathLength="1" d="M284,0 C284,34 187.5,22 187.5,56"/>
-      <path pathLength="1" d="M306,0 C306,34 312.5,22 312.5,56"/>
-      <path pathLength="1" d="M315,0 C315,34 437.5,22 437.5,56"/>
-      <path pathLength="1" d="M329,0 C329,34 562.5,22 562.5,56"/>
-      <path pathLength="1" d="M381,0 C381,34 687.5,22 687.5,56"/>
-      <path pathLength="1" d="M384,0 C384,34 812.5,22 812.5,56"/>
-      <path pathLength="1" d="M409,0 C409,34 937.5,22 937.5,56"/>
+      <path pathLength="1" d="M269,0 C269,34 55.6,22 55.6,56"/>
+      <path pathLength="1" d="M284,0 C284,34 166.7,22 166.7,56"/>
+      <path pathLength="1" d="M285,0 C285,34 277.8,22 277.8,56"/>
+      <path pathLength="1" d="M305,0 C305,34 388.9,22 388.9,56"/>
+      <path pathLength="1" d="M315,0 C315,34 500,22 500,56"/>
+      <path pathLength="1" d="M329,0 C329,34 611.1,22 611.1,56"/>
+      <path pathLength="1" d="M379,0 C379,34 722.2,22 722.2,56"/>
+      <path pathLength="1" d="M382,0 C382,34 833.3,22 833.3,56"/>
+      <path pathLength="1" d="M408,0 C408,34 944.4,22 944.4,56"/>
     </svg>
     <div class="race-rivals">
       <div class="rv" data-h="90000"><img src="assets/moodeng.jpg" alt="Moo Deng"><span class="nm">MOODENG</span><span class="hc">~90K</span></div>
       <div class="rv" data-h="120000"><img src="assets/popcat.jpg" alt="Popcat"><span class="nm">POPCAT</span><span class="hc">~120K</span></div>
+      <div class="rv" data-h="121000"><img src="assets/pump.png" alt="Pump"><span class="nm">PUMP</span><span class="hc">~121K</span></div>
       <div class="rv" data-h="175000"><img src="assets/fartcoin.jpg" alt="Fartcoin"><span class="nm">FARTCOIN</span><span class="hc">~175K</span></div>
       <div class="rv" data-h="210000"><img src="assets/wif.jpg" alt="dogwifhat"><span class="nm">WIF</span><span class="hc">~210K</span></div>
       <div class="rv" data-h="270000"><img src="assets/pnut.png" alt="Peanut the Squirrel"><span class="nm">PNUT</span><span class="hc">~270K</span></div>
