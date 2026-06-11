@@ -11,7 +11,7 @@
 <link rel="icon" href="assets/coin.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Bungee&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Bungee&family=Azeret+Mono:wght@600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0a0c0a;
@@ -26,7 +26,7 @@
     --text:#d8e6d8;
     --muted:#6f8470;
     --mono:'IBM Plex Mono',monospace;
-    --timer:'VT323',monospace;
+    --timer:'Azeret Mono',monospace;
     --display:'Bungee',cursive;
   }
   *{margin:0;padding:0;box-sizing:border-box}
@@ -120,7 +120,7 @@
   }
   .race-head .tag{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:700}
   .race-count{
-    font-family:var(--timer);font-size:34px;line-height:1;color:var(--green);
+    font-family:var(--timer);font-weight:700;font-size:27px;line-height:1;color:var(--green);
     text-shadow:0 0 14px rgba(43,217,74,.5);font-variant-numeric:tabular-nums;
   }
   .race-count small{font-size:.5em;color:var(--muted);font-family:var(--mono);letter-spacing:.1em}
@@ -274,7 +274,7 @@
   }
   .hs:hover{border-color:var(--green-dim);transform:translateY(-3px)}
   .hs-v{
-    display:block;font-family:var(--timer);font-size:30px;line-height:1;color:var(--green);
+    display:block;font-family:var(--timer);font-weight:700;font-size:23px;line-height:1;color:var(--green);
     text-shadow:0 0 12px rgba(43,217,74,.35);font-variant-numeric:tabular-nums;
   }
   .hs-l{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
@@ -294,7 +294,7 @@
   @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
   .timerbox__title{font-size:13px;font-weight:700;letter-spacing:.06em}
   .timerbox__cat{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
-  .wr-badge{margin-left:auto;font-size:11px;font-weight:700;color:#1a1300;background:var(--gold);padding:4px 9px;border-radius:3px;letter-spacing:.1em}
+  .wr-badge{margin-left:auto;font-size:11px;font-weight:700;color:#fff;background:var(--usdc);padding:4px 10px;border-radius:999px;letter-spacing:.1em}
   .holders-head{
     display:flex;align-items:center;justify-content:center;gap:9px;
     margin-top:24px;
@@ -318,8 +318,8 @@
     100%{opacity:0;transform:translateY(-6px)}
   }
   .timer{
-    font-family:var(--timer);font-size:clamp(64px,7vw,92px);line-height:1;
-    text-align:center;padding:8px 10px 2px;color:var(--green);
+    font-family:var(--timer);font-weight:700;font-size:clamp(44px,4.8vw,64px);line-height:1;
+    text-align:center;padding:10px 10px 4px;color:var(--green);
     text-shadow:0 0 18px rgba(43,217,74,.55);
     font-variant-numeric:tabular-nums;letter-spacing:.02em;
     animation:crt 7s linear infinite;
@@ -472,7 +472,7 @@
     background:radial-gradient(560px 300px at 50% 60%,rgba(43,217,74,.13),transparent 70%);
   }
   .final h2{font-size:clamp(34px,5vw,64px)}
-  .final .timer-mini{font-family:var(--timer);font-size:30px;color:var(--green);margin:18px 0 30px;text-shadow:0 0 14px rgba(43,217,74,.5)}
+  .final .timer-mini{font-family:var(--timer);font-weight:700;font-size:26px;color:var(--green);margin:18px 0 30px;text-shadow:0 0 14px rgba(43,217,74,.5)}
 
   footer{
     border-top:1px solid var(--line);padding:34px 28px;text-align:center;
@@ -585,7 +585,7 @@
         <div class="timerbox__title">Speedrun To 1 Billion</div>
         <div class="timerbox__cat">Holders · Solana · USDC</div>
       </div>
-      <span class="wr-badge">WR ATTEMPT</span>
+      <span class="wr-badge">USDC PAIRED</span>
     </div>
     <div class="holders-head"><span class="hdot"></span>LIVE HOLDERS</div>
     <div class="timer" id="heroHolders">···</div>
