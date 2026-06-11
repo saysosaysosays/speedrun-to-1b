@@ -357,6 +357,16 @@
   }
   .timer small{font-size:.45em;color:var(--green-dim)}
   .timer-label{text-align:center;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);padding-bottom:20px}
+  /* holder-growth sparkline */
+  .spark-wrap{padding:12px 18px 14px;border-top:1px solid var(--line)}
+  .spark-cap{
+    display:flex;align-items:center;gap:7px;
+    font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:6px;
+  }
+  .spark-cap b{color:var(--green);font-weight:700;letter-spacing:.06em}
+  .spark{display:block;width:100%;height:46px}
+  #sparkLine{stroke:var(--green);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;filter:drop-shadow(0 0 3px rgba(43,217,74,.5))}
+
   .splits{border-top:1px solid var(--line);font-size:13px}
   .split{
     display:flex;align-items:center;padding:9px 18px;gap:10px;
@@ -474,6 +484,15 @@
   .chart-copy p{font-size:14px;line-height:1.75;color:var(--muted);max-width:52ch}
   .chart-copy p b{color:var(--green)}
 
+  /* live chart embed */
+  .chart-embed{
+    margin-top:30px;border:1px solid var(--line);border-radius:14px;
+    overflow:hidden;background:var(--panel);height:500px;
+    box-shadow:0 24px 60px -30px rgba(0,0,0,.8);
+  }
+  .chart-embed iframe{width:100%;height:100%;display:block;border:0}
+  @media(max-width:640px){.chart-embed{height:420px}}
+
   /* how to buy */
   .steps{counter-reset:step;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:42px}
   .step{
@@ -538,6 +557,7 @@
   <div class="nav-links">
     <span class="nav-holders"><span class="live-dot"></span><b id="navCount">···</b> HOLDERS</span>
     <a href="#run">The Run</a>
+    <a href="#chart">Chart</a>
     <a href="#buy">How To Buy</a>
     <a href="https://x.com/i/communities/2038227694756700494" target="_blank" rel="noopener">Community</a>
     <a class="btn" href="https://pump.fun/coin/2Mcwccy7Ckf6C2BUfwG9Z6kcYp8Mj5tKFBHEEoYCpump" target="_blank" rel="noopener">BUY $1B</a>
@@ -619,6 +639,17 @@
     <div class="timer" id="heroHolders">···</div>
     <div class="holders-delta" id="holdersDelta"></div>
     <div class="timer-label">goal: 1,000,000,000 · <span id="timer">00:00:00</span> since launch</div>
+    <div class="spark-wrap">
+      <div class="spark-cap">HOLDER GROWTH · <b id="sparkRange">LAST HOUR</b></div>
+      <svg class="spark" viewBox="0 0 300 46" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#2bd94a" stop-opacity=".4"/>
+          <stop offset="1" stop-color="#2bd94a" stop-opacity="0"/>
+        </linearGradient></defs>
+        <path id="sparkArea" fill="url(#sparkGrad)"></path>
+        <path id="sparkLine" fill="none"></path>
+      </svg>
+    </div>
     <div class="splits">
       <div class="split done"><span class="gold-dot"></span><span class="name">First 100 holders</span><span class="delta">−0:12</span><span class="time">DONE</span></div>
       <div class="split done"><span class="gold-dot"></span><span class="name">Lap honestchud</span><span class="delta">−14:59</span><span class="time">DONE</span></div>
@@ -686,6 +717,17 @@
       The squiggles in the middle are the skips. Any technical analyst will confirm this is
       the single most bullish chart formation known to science: <b>green line that goes up</b>.</p>
     </div>
+  </div>
+</section>
+
+<section id="chart">
+  <div class="sec-tag">// Live Chart</div>
+  <h2>PRICE ACTION</h2>
+  <p class="sec-sub">$1B / USDC on PumpSwap — live candles from GeckoTerminal.</p>
+  <div class="chart-embed">
+    <iframe title="1B / USDC live chart" loading="lazy"
+      src="https://www.geckoterminal.com/solana/pools/63BbTbh2jdYLE4DXZVAKn7aDoyPYRVjwtcRsc35ka5vG?embed=1&info=0&swaps=0&grayscale=0&light_chart=0&chart_type=price&resolution=15m"
+      frameborder="0" allow="clipboard-write" allowfullscreen></iframe>
   </div>
 </section>
 
@@ -804,6 +846,7 @@
       const t = Array.isArray(data) && data.find(x => x.id === MINT);
       if (t && typeof t.holderCount === 'number'){
         const v = t.holderCount, now = Date.now();
+        seedHist(t.stats1h && t.stats1h.holderChange, t.stats5m && t.stats5m.holderChange, v);
         if (t.stats5m && typeof t.stats5m.holderChange === 'number'){
           ratePerMs = Math.max(0, v * (t.stats5m.holderChange/100) / 300000);
         } else if (lastFetched !== undefined && now > baseTime){
@@ -825,12 +868,51 @@
       }
     }catch(e){ /* keep last known count */ }
     renderHolders();
+    pushHist();
   }
   // real-time ticker: advance the displayed count every second along the estimated rate
   setInterval(() => {
     const est = Math.round(baseHolders + ratePerMs * (Date.now() - baseTime));
-    if (est > holders){ holders = est; renderHolders(); }
+    if (est > holders){ holders = est; renderHolders(); pushHist(); }
   }, 1000);
+
+  // ---- holder growth line ----
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem('holderHist') || '[]'); } catch(e){}
+  function seedHist(ch1h, ch5m, v){
+    // first ever visit: backfill real anchor points from Jupiter's % change windows
+    if (hist.length < 2){
+      const now = Date.now();
+      const h1 = ch1h ? Math.round(v / (1 + ch1h/100)) : v;
+      const h5 = ch5m ? Math.round(v / (1 + ch5m/100)) : v;
+      hist = [{t:now-3600000, v:h1}, {t:now-300000, v:h5}, {t:now, v:v}];
+    }
+  }
+  function pushHist(){
+    const now = Date.now();
+    if (!hist.length || now - hist[hist.length-1].t > 30000){
+      hist.push({t:now, v:holders});
+    } else {
+      hist[hist.length-1].v = holders;
+    }
+    const cut = now - 6*3600000;
+    hist = hist.filter(p => p.t >= cut).slice(-90);
+    try { localStorage.setItem('holderHist', JSON.stringify(hist)); } catch(e){}
+    drawSpark();
+  }
+  function drawSpark(){
+    if (hist.length < 2) return;
+    const W=300, H=46, pad=3;
+    const ts = hist.map(p=>p.t), vs = hist.map(p=>p.v);
+    const t0=Math.min(...ts), t1=Math.max(...ts), v0=Math.min(...vs), v1=Math.max(...vs);
+    const x = t => t1===t0 ? W : ((t-t0)/(t1-t0))*W;
+    const y = v => v1===v0 ? H/2 : pad + (1-(v-v0)/(v1-v0))*(H-2*pad);
+    const line = 'M' + hist.map(p => x(p.t).toFixed(1)+','+y(p.v).toFixed(1)).join(' L');
+    document.getElementById('sparkLine').setAttribute('d', line);
+    document.getElementById('sparkArea').setAttribute('d', line + ` L${W},${H} L0,${H} Z`);
+    const span = (t1 - t0)/3600000;
+    document.getElementById('sparkRange').textContent = span >= 1.5 ? 'LAST ' + Math.round(span) + ' HRS' : 'LAST HOUR';
+  }
   renderHolders();
   fetchHolders();
   setInterval(fetchHolders, 60000);
