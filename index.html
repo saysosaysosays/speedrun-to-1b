@@ -127,8 +127,15 @@
     background:linear-gradient(90deg,var(--green-dim),var(--green));
     box-shadow:0 0 16px rgba(43,217,74,.6);
     transition:width 1.2s cubic-bezier(.2,.8,.2,1);
-    min-width:6px;
+    min-width:6px;overflow:hidden;
   }
+  .race-fill::before{
+    content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(-55deg,rgba(255,255,255,.16) 0 9px,transparent 9px 18px);
+    background-size:22px 22px;
+    animation:stripes .9s linear infinite;
+  }
+  @keyframes stripes{to{background-position:22px 0}}
   .race-fill::after{
     content:"";position:absolute;right:-2px;top:50%;transform:translate(0,-50%);
     width:10px;height:26px;border-radius:3px;background:var(--green);
@@ -168,7 +175,7 @@
   .race-me .c{font-size:13px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
   /* fan-out connectors from ticks down to the evenly spaced rival cards */
   .race-fan{display:block;width:100%;height:52px}
-  .race-fan line{stroke:var(--green-dim);stroke-opacity:.5;stroke-width:1}
+  .race-fan path{stroke:url(#fanGrad);fill:none;stroke-width:1.5}
   .race-rivals{display:flex}
   .race-rivals .rv{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
   .rv img{
@@ -179,6 +186,21 @@
   .rv:hover img{transform:scale(1.12);border-color:var(--green-dim)}
   .rv .nm{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--text)}
   .rv .hc{font-size:10px;color:var(--muted)}
+  /* rival already lapped by $1B */
+  .rv.flipped img{border-color:var(--green);box-shadow:0 0 16px rgba(43,217,74,.5);filter:grayscale(.5)}
+  .rv.flipped .nm{color:var(--muted);text-decoration:line-through}
+  .rv.flipped .nm::after{content:" ✓ FLIPPED";color:var(--green);text-decoration:none;display:inline-block;margin-left:2px}
+  /* holder count bump on update */
+  .race-count{display:inline-block}
+  .race-count.bump{animation:bump .5s ease}
+  @keyframes bump{35%{transform:scale(1.08)}}
+  /* scroll reveal */
+  .rev{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+  .rev.vis{opacity:1;transform:none}
+  @media (prefers-reduced-motion: reduce){
+    .rev{opacity:1;transform:none;transition:none}
+    .race-fill::before,.race-fill::after,.marquee__inner{animation:none}
+  }
   .race-foot{font-size:11px;color:var(--muted);letter-spacing:.08em}
   .race-foot b{color:var(--text)}
   @media(max-width:640px){
@@ -451,30 +473,36 @@
   <div class="race-track-wrap">
     <div class="race-track">
       <div class="race-fill" id="raceFill"></div>
-      <div class="rtick" style="left:58.3%"></div>
-      <div class="rtick" style="left:59.1%"></div>
-      <div class="rtick" style="left:64.4%"></div>
-      <div class="rtick" style="left:64.6%"></div>
-      <div class="rtick" style="left:66.6%"></div>
+      <div class="rtick" style="left:30.6%"></div>
+      <div class="rtick" style="left:31.5%"></div>
+      <div class="rtick" style="left:38.1%"></div>
+      <div class="rtick" style="left:38.4%"></div>
+      <div class="rtick" style="left:40.9%"></div>
       <div class="race-goal" style="left:100%"><span class="lbl">🏁 1B</span></div>
       <div class="race-me" id="raceMe" style="left:0%"><img src="assets/coin.png" alt="$1B"><span class="t">$1B</span><span class="c" id="meCount">···</span></div>
     </div>
     <svg class="race-fan" viewBox="0 0 1000 52" preserveAspectRatio="none" aria-hidden="true">
-      <line x1="583" y1="0" x2="100" y2="52"/>
-      <line x1="591" y1="0" x2="300" y2="52"/>
-      <line x1="644" y1="0" x2="500" y2="52"/>
-      <line x1="646" y1="0" x2="700" y2="52"/>
-      <line x1="666" y1="0" x2="900" y2="52"/>
+      <defs>
+        <linearGradient id="fanGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#2bd94a" stop-opacity=".5"/>
+          <stop offset="1" stop-color="#2bd94a" stop-opacity=".1"/>
+        </linearGradient>
+      </defs>
+      <path d="M306,2 C306,32 100,20 100,50"/>
+      <path d="M315,2 C315,32 300,20 300,50"/>
+      <path d="M381,2 C381,32 500,20 500,50"/>
+      <path d="M384,2 C384,32 700,20 700,50"/>
+      <path d="M409,2 C409,32 900,20 900,50"/>
     </svg>
     <div class="race-rivals">
-      <div class="rv"><img src="assets/fartcoin.jpg" alt="Fartcoin"><span class="nm">FARTCOIN</span><span class="hc">~175K</span></div>
-      <div class="rv"><img src="assets/wif.jpg" alt="dogwifhat"><span class="nm">WIF</span><span class="hc">~210K</span></div>
-      <div class="rv"><img src="assets/pengu.png" alt="Pudgy Penguins"><span class="nm">PENGU</span><span class="hc">~620K</span></div>
-      <div class="rv"><img src="assets/trump.png" alt="Official Trump"><span class="nm">TRUMP</span><span class="hc">~650K</span></div>
-      <div class="rv"><img src="assets/bonk.jpg" alt="Bonk"><span class="nm">BONK</span><span class="hc">~980K</span></div>
+      <div class="rv" data-h="175000"><img src="assets/fartcoin.jpg" alt="Fartcoin"><span class="nm">FARTCOIN</span><span class="hc">~175K</span></div>
+      <div class="rv" data-h="210000"><img src="assets/wif.jpg" alt="dogwifhat"><span class="nm">WIF</span><span class="hc">~210K</span></div>
+      <div class="rv" data-h="620000"><img src="assets/pengu.png" alt="Pudgy Penguins"><span class="nm">PENGU</span><span class="hc">~620K</span></div>
+      <div class="rv" data-h="650000"><img src="assets/trump.png" alt="Official Trump"><span class="nm">TRUMP</span><span class="hc">~650K</span></div>
+      <div class="rv" data-h="980000"><img src="assets/bonk.jpg" alt="Bonk"><span class="nm">BONK</span><span class="hc">~980K</span></div>
     </div>
   </div>
-  <div class="race-foot" style="margin-top:18px">log scale · live on-chain holder count · next lap: <b>flip fartcoin</b></div>
+  <div class="race-foot" style="margin-top:18px">log scale · live on-chain holder count · next lap: <b id="nextLap">flip fartcoin</b></div>
 </div>
 
 <header class="hero">
@@ -502,7 +530,7 @@
       <img src="assets/coin.png" alt="$1B">
       <div>
         <div class="timerbox__title">Speedrun To 1 Billion</div>
-        <div class="timerbox__cat">Holders% · Solana · USDC</div>
+        <div class="timerbox__cat">Holders · Solana · USDC</div>
       </div>
       <span class="wr-badge">WR ATTEMPT</span>
     </div>
@@ -547,7 +575,7 @@
 
 <section id="run">
   <div class="sec-tag">// Run Rules</div>
-  <h2>CATEGORY: HOLDERS%</h2>
+  <h2>CATEGORY: HOLDERS</h2>
   <p class="sec-sub">Every speedrun has rules. Ours are simple.</p>
   <div class="cards">
     <div class="card">
@@ -647,8 +675,11 @@
   const MINT = '2Mcwccy7Ckf6C2BUfwG9Z6kcYp8Mj5tKFBHEEoYCpump';
   const GOAL_LOG = Math.log10(1e9);
   let holders = 78246; // last known fallback
+  // log scale compressed with a power curve so the remaining distance to 1B reads honestly
+  const SCALE_EXP = 2.2;
+  const toPct = h => Math.pow(Math.log10(Math.max(h,1)) / GOAL_LOG, SCALE_EXP) * 100;
   function renderHolders(){
-    const pct = Math.min(100, Math.max(1, (Math.log10(Math.max(holders,1)) / GOAL_LOG) * 100));
+    const pct = Math.min(100, Math.max(1, toPct(holders)));
     const fmt = holders.toLocaleString('en-US');
     document.getElementById('holderCount').textContent = fmt;
     document.getElementById('meCount').textContent = fmt;
@@ -656,6 +687,20 @@
     document.getElementById('raceFill').style.width = pct + '%';
     // keep the chip from clipping off the track edges
     document.getElementById('raceMe').style.left = Math.min(94, Math.max(6, pct)) + '%';
+    // mark rivals $1B has already lapped, and point at the next one
+    let next = null;
+    document.querySelectorAll('.race-rivals .rv').forEach(rv => {
+      const flipped = holders > +rv.dataset.h;
+      rv.classList.toggle('flipped', flipped);
+      if (!flipped && !next) next = rv.querySelector('.nm').textContent.split(' ')[0];
+    });
+    document.getElementById('nextLap').textContent = next ? 'flip ' + next.toLowerCase() : '1,000,000,000 holders';
+    // bump the counter when the number changes
+    if (renderHolders.last !== holders){
+      const rc = document.querySelector('.race-count');
+      rc.classList.remove('bump'); void rc.offsetWidth; rc.classList.add('bump');
+      renderHolders.last = holders;
+    }
   }
   // Jupiter token API: real on-chain holder count (same number DexScreener shows),
   // free + CORS-enabled. pump.fun's num_participants only counts bonding-curve traders.
@@ -678,6 +723,16 @@
   renderHolders();
   fetchHolders();
   setInterval(fetchHolders, 60000);
+
+  // scroll-reveal: sections fade up as they enter the viewport
+  const obs = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting){ e.target.classList.add('vis'); obs.unobserve(e.target); }
+  }), {threshold:.15});
+  document.querySelectorAll('.card, .step, .chart-strip, .xcard, section h2, .sec-sub, .sec-tag').forEach((el, i) => {
+    el.classList.add('rev');
+    el.style.transitionDelay = (i % 3) * 90 + 'ms';
+    obs.observe(el);
+  });
 
   function copyCA(){
     navigator.clipboard.writeText(document.getElementById('ca').textContent.trim()).then(()=>{
