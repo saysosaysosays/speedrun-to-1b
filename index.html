@@ -132,9 +132,11 @@
   .race-fill::after{
     content:"";position:absolute;right:-2px;top:50%;transform:translate(0,-50%);
     width:10px;height:26px;border-radius:3px;background:var(--green);
-    box-shadow:0 0 14px rgba(43,217,74,.9);
-    animation:blink 1.1s steps(2) infinite;
+    box-shadow:0 0 12px rgba(43,217,74,.8);
+    animation:pulse 1.6s ease-in-out infinite;
+    will-change:opacity;
   }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
   /* tick at each rival's true log-scale position */
   .rtick{
     position:absolute;top:-3px;bottom:-3px;width:2px;border-radius:2px;
@@ -436,6 +438,7 @@
     <span class="nav-holders"><span class="live-dot"></span><b id="navCount">···</b> HOLDERS</span>
     <a href="#run">The Run</a>
     <a href="#buy">How To Buy</a>
+    <a href="https://x.com/i/communities/2038227694756700494" target="_blank" rel="noopener">Community</a>
     <a class="btn" href="https://pump.fun/coin/2Mcwccy7Ckf6C2BUfwG9Z6kcYp8Mj5tKFBHEEoYCpump" target="_blank" rel="noopener">BUY $1B</a>
   </div>
 </nav>
@@ -476,7 +479,6 @@
 
 <header class="hero">
   <div>
-    <div class="live-pill"><span class="live-dot"></span> RUN IN PROGRESS — DAY <span id="runDay">1</span> · LIVE ON PUMP.FUN</div>
     <h1>SPEEDRUN<br>TO <span class="g">1 BILLION</span></h1>
     <p class="hero-sub">
       toly said the next real race is <b>a coin with 1,000,000,000 holders</b>.
@@ -610,6 +612,7 @@
   <div class="links">
     <a href="https://pump.fun/coin/2Mcwccy7Ckf6C2BUfwG9Z6kcYp8Mj5tKFBHEEoYCpump" target="_blank" rel="noopener">pump.fun</a>
     <a href="https://x.com/ratwizardx" target="_blank" rel="noopener">X / Twitter</a>
+    <a href="https://x.com/i/communities/2038227694756700494" target="_blank" rel="noopener">Community</a>
     <a href="https://dexscreener.com/solana/2Mcwccy7Ckf6C2BUfwG9Z6kcYp8Mj5tKFBHEEoYCpump" target="_blank" rel="noopener">Chart</a>
   </div>
   <div>$1B is a memecoin with no intrinsic value or expectation of financial return. It is a speedrun, not financial advice.<br>
@@ -632,7 +635,6 @@
     const cs = Math.floor(ms/10)%100;
     t1.innerHTML = `${pad(h)}:${pad(m)}:${pad(s)}<small>.${pad(cs)}</small>`;
     t2.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
-    document.getElementById('runDay').textContent = Math.floor(ms/86400000) + 1;
     requestAnimationFrame(tick);
   }
   tick();
