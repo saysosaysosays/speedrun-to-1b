@@ -11,7 +11,7 @@
 <link rel="icon" href="assets/coin.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Bungee&family=Azeret+Mono:wght@600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Bungee&family=Azeret+Mono:wght@600;700&family=Inter:wght@700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0a0c0a;
@@ -294,7 +294,6 @@
   @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
   .timerbox__title{font-size:13px;font-weight:700;letter-spacing:.06em}
   .timerbox__cat{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
-  .wr-badge{margin-left:auto;font-size:11px;font-weight:700;color:#fff;background:var(--usdc);padding:4px 10px;border-radius:999px;letter-spacing:.1em}
   .holders-head{
     display:flex;align-items:center;justify-content:center;gap:9px;
     margin-top:24px;
@@ -318,7 +317,8 @@
     100%{opacity:0;transform:translateY(-6px)}
   }
   .timer{
-    font-family:var(--timer);font-weight:700;font-size:clamp(44px,4.8vw,64px);line-height:1;
+    font-family:'Inter',sans-serif;font-weight:800;letter-spacing:-.015em;
+    font-size:clamp(46px,5vw,66px);line-height:1;
     text-align:center;padding:10px 10px 4px;color:var(--green);
     text-shadow:0 0 18px rgba(43,217,74,.55);
     font-variant-numeric:tabular-nums;letter-spacing:.02em;
@@ -585,7 +585,6 @@
         <div class="timerbox__title">Speedrun To 1 Billion</div>
         <div class="timerbox__cat">Holders · Solana · USDC</div>
       </div>
-      <span class="wr-badge">USDC PAIRED</span>
     </div>
     <div class="holders-head"><span class="hdot"></span>LIVE HOLDERS</div>
     <div class="timer" id="heroHolders">···</div>
@@ -756,34 +755,48 @@
       [document.querySelector('.race-count'), document.getElementById('heroHolders')].forEach(el => {
         el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
       });
-      // float a "+N" above the label when the count grows
-      const d = holders - renderHolders.last;
-      if (renderHolders.last !== undefined && d > 0){
-        const de = document.getElementById('holdersDelta');
-        de.textContent = '▲ +' + d.toLocaleString('en-US') + ' holders';
-        de.classList.remove('pop'); void de.offsetWidth; de.classList.add('pop');
-      }
       renderHolders.last = holders;
     }
   }
   // Jupiter token API: real on-chain holder count (same number DexScreener shows),
   // free + CORS-enabled. pump.fun's num_participants only counts bonding-curve traders.
   const compact = n => n >= 1e9 ? (n/1e9).toFixed(2)+'B' : n >= 1e6 ? (n/1e6).toFixed(2)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : n.toFixed(0);
+  // between API refreshes, estimate live growth from Jupiter's 5-minute holder-change stat
+  let baseHolders = holders, baseTime = Date.now(), ratePerMs = 0, lastFetched;
   async function fetchHolders(){
     try{
       const res = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${MINT}`);
       const data = await res.json();
       const t = Array.isArray(data) && data.find(x => x.id === MINT);
-      if (t && typeof t.holderCount === 'number') holders = t.holderCount;
+      if (t && typeof t.holderCount === 'number'){
+        const v = t.holderCount, now = Date.now();
+        if (t.stats5m && typeof t.stats5m.holderChange === 'number'){
+          ratePerMs = Math.max(0, v * (t.stats5m.holderChange/100) / 300000);
+        } else if (lastFetched !== undefined && now > baseTime){
+          ratePerMs = Math.max(0, (v - lastFetched) / (now - baseTime));
+        }
+        if (lastFetched !== undefined && v > lastFetched){
+          const de = document.getElementById('holdersDelta');
+          de.textContent = '▲ +' + (v - lastFetched).toLocaleString('en-US') + ' holders';
+          de.classList.remove('pop'); void de.offsetWidth; de.classList.add('pop');
+        }
+        lastFetched = v; baseHolders = v; baseTime = now;
+        holders = v;
+      }
       if (t){
         if (t.usdPrice) document.getElementById('statPrice').textContent = '$' + Number(t.usdPrice.toPrecision(2));
         if (t.mcap) document.getElementById('statMcap').textContent = '$' + compact(t.mcap);
-        const v = t.stats24h ? (t.stats24h.buyVolume||0) + (t.stats24h.sellVolume||0) : 0;
-        if (v) document.getElementById('statVol').textContent = '$' + compact(v);
+        const v24 = t.stats24h ? (t.stats24h.buyVolume||0) + (t.stats24h.sellVolume||0) : 0;
+        if (v24) document.getElementById('statVol').textContent = '$' + compact(v24);
       }
     }catch(e){ /* keep last known count */ }
     renderHolders();
   }
+  // real-time ticker: advance the displayed count every second along the estimated rate
+  setInterval(() => {
+    const est = Math.round(baseHolders + ratePerMs * (Date.now() - baseTime));
+    if (est > holders){ holders = est; renderHolders(); }
+  }, 1000);
   renderHolders();
   fetchHolders();
   setInterval(fetchHolders, 60000);
