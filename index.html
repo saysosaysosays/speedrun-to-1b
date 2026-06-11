@@ -454,7 +454,7 @@
       <div class="rv"><img src="assets/bonk.jpg" alt="Bonk"><span class="nm">BONK</span><span class="hc">~980K</span></div>
     </div>
   </div>
-  <div class="race-foot" style="margin-top:18px">log scale · holders · live from pump.fun · next lap: <b>flip fartcoin</b></div>
+  <div class="race-foot" style="margin-top:18px">log scale · live on-chain holder count · next lap: <b>flip fartcoin</b></div>
 </div>
 
 <header class="hero">
@@ -615,7 +615,7 @@
   // live holder count from pump.fun (via CORS proxy), log-scale progress to 1B
   const MINT = '2Mcwccy7Ckf6C2BUfwG9Z6kcYp8Mj5tKFBHEEoYCpump';
   const GOAL_LOG = Math.log10(1e9);
-  let holders = 320; // last known fallback
+  let holders = 78246; // last known fallback
   function renderHolders(){
     const pct = Math.min(100, Math.max(1, (Math.log10(Math.max(holders,1)) / GOAL_LOG) * 100));
     const fmt = holders.toLocaleString('en-US');
@@ -626,21 +626,15 @@
     // keep the chip from clipping off the track edges
     document.getElementById('raceMe').style.left = Math.min(94, Math.max(6, pct)) + '%';
   }
-  const PROXIES = [
-    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-    u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`
-  ];
+  // Jupiter token API: real on-chain holder count (same number DexScreener shows),
+  // free + CORS-enabled. pump.fun's num_participants only counts bonding-curve traders.
   async function fetchHolders(){
-    const api = `https://frontend-api-v3.pump.fun/coins/${MINT}`;
-    for (const proxy of PROXIES){
-      try{
-        const res = await fetch(proxy(api));
-        const text = await res.text();
-        // tolerant parse: works for raw JSON and allorigins' escaped "contents" wrapper
-        const m = text.match(/num_participants\\?":\s*(\d+)/);
-        if (m){ holders = +m[1]; break; }
-      }catch(e){ /* try next proxy */ }
-    }
+    try{
+      const res = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${MINT}`);
+      const data = await res.json();
+      const t = Array.isArray(data) && data.find(x => x.id === MINT);
+      if (t && typeof t.holderCount === 'number') holders = t.holderCount;
+    }catch(e){ /* keep last known count */ }
     renderHolders();
   }
   renderHolders();
