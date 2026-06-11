@@ -810,7 +810,12 @@
 
   // scroll-reveal: sections fade up as they enter the viewport
   const obs = new IntersectionObserver(entries => entries.forEach(e => {
-    if (e.isIntersecting){ e.target.classList.add('vis'); obs.unobserve(e.target); }
+    if (e.isIntersecting){
+      e.target.classList.add('vis');
+      // clear the stagger delay once revealed so it doesn't lag hover transitions
+      setTimeout(() => { e.target.style.transitionDelay = ''; }, 1100);
+      obs.unobserve(e.target);
+    }
   }), {threshold:.15});
   document.querySelectorAll('.card, .step, .chart-strip, .xcard, section h2, .sec-sub, .sec-tag').forEach((el, i) => {
     el.classList.add('rev');
